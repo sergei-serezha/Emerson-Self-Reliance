@@ -4,82 +4,285 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Emerson Self-Reliance Network</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,500;6..72,700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body {
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    :root {
+      --bg-top: #fbf7ef;
+      --bg-bottom: #f3ede2;
+      --ink: #182237;
+      --muted: #5b667d;
+      --panel: rgba(255, 255, 255, 0.76);
+      --panel-border: rgba(148, 163, 184, 0.24);
+      --panel-shadow: 0 26px 60px rgba(15, 23, 42, 0.1);
+      --agree: #1f7a45;
+      --agree-soft: #dbf5e4;
+      --disagree: #bf2f31;
+      --disagree-soft: #fde4e1;
+      --neutral-soft: rgba(232, 237, 246, 0.92);
+      --neutral-border: rgba(100, 116, 139, 0.16);
     }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      position: relative;
+      font-family: "Manrope", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 6% 8%, rgba(238, 188, 116, 0.24), transparent 22%),
+        radial-gradient(circle at 92% 10%, rgba(127, 179, 255, 0.18), transparent 20%),
+        linear-gradient(180deg, var(--bg-top) 0%, var(--bg-bottom) 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(148, 163, 184, 0.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148, 163, 184, 0.12) 1px, transparent 1px);
+      background-size: 112px 112px;
+      mask-image: radial-gradient(circle at center, black 30%, transparent 76%);
+      opacity: 0.16;
+    }
+
+    .display-font {
+      font-family: "Newsreader", Georgia, serif;
+      letter-spacing: -0.04em;
+    }
+
+    .kicker {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #697891;
+    }
+
+    .panel {
+      border: 1px solid var(--panel-border);
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      box-shadow: var(--panel-shadow);
+    }
+
+    .subpanel {
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(247, 249, 252, 0.85);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    }
+
+    .panel-dark {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: linear-gradient(160deg, #16213a 0%, #0f172a 100%);
+      box-shadow: 0 24px 50px rgba(15, 23, 42, 0.24);
+    }
+
+    .idea-card,
+    .directory-card,
+    .topic-card,
+    .soft-button {
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      background: rgba(248, 250, 252, 0.78);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+      transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .idea-card:hover,
+    .directory-card:hover,
+    .topic-card:hover,
+    .soft-button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .idea-card.active,
+    .directory-card.active,
+    .topic-card.active {
+      border-color: rgba(255, 255, 255, 0.08);
+      background: linear-gradient(160deg, #16213a 0%, #0f172a 100%);
+      box-shadow: 0 24px 50px rgba(15, 23, 42, 0.24);
+      color: white;
+    }
+
+    .muted-on-dark {
+      color: #c6cfde;
+    }
+
+    .stat-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      padding: 0.55rem 0.95rem;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      backdrop-filter: blur(8px);
+    }
+
+    .stat-pill::before {
+      content: "";
+      height: 0.5rem;
+      width: 0.5rem;
+      border-radius: 999px;
+      background: currentColor;
+      opacity: 0.8;
+    }
+
+    .stat-pill--agree {
+      border-color: rgba(34, 197, 94, 0.18);
+      background: rgba(219, 245, 228, 0.94);
+      color: #17663d;
+    }
+
+    .stat-pill--disagree {
+      border-color: rgba(239, 68, 68, 0.16);
+      background: rgba(253, 228, 225, 0.96);
+      color: #b42318;
+    }
+
+    .stat-pill--neutral {
+      border-color: var(--neutral-border);
+      background: var(--neutral-soft);
+      color: #44516a;
+    }
+
+    .graph-stage {
+      background:
+        linear-gradient(90deg, rgba(219, 245, 228, 0.64) 0%, rgba(248, 250, 252, 0.92) 42%, rgba(253, 228, 225, 0.74) 100%),
+        radial-gradient(circle at center, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.3) 54%, rgba(255, 255, 255, 0) 72%);
+      box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -36px 90px rgba(255, 255, 255, 0.34);
+    }
+
+    .graph-stage::before,
+    .graph-stage::after {
+      content: "";
+      position: absolute;
+      top: 3.25rem;
+      bottom: 1.5rem;
+      width: 34%;
+      pointer-events: none;
+      filter: blur(34px);
+      opacity: 0.46;
+    }
+
+    .graph-stage::before {
+      left: 1.5rem;
+      background: radial-gradient(circle at center, rgba(34, 197, 94, 0.18), transparent 68%);
+    }
+
+    .graph-stage::after {
+      right: 1.5rem;
+      background: radial-gradient(circle at center, rgba(239, 68, 68, 0.16), transparent 68%);
+    }
+
+    .emerson-badge {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(17, 24, 39, 0.94);
+      box-shadow:
+        0 18px 42px rgba(15, 23, 42, 0.26),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      max-width: 240px;
+    }
+
+    .graph-svg text {
+      font-family: "Manrope", sans-serif;
+    }
+
     .stance-agree { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
     .stance-disagree { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
     .stance-mixed { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+
+    @media (max-width: 1279px) {
+      body::before {
+        opacity: 0.1;
+      }
+
+      .graph-stage::before,
+      .graph-stage::after {
+        width: 42%;
+      }
+    }
   </style>
 </head>
-<body class="min-h-screen bg-slate-50 text-slate-900 p-6">
-  <div class="mx-auto max-w-7xl grid grid-cols-1 gap-6 xl:grid-cols-[320px_minmax(0,1fr)_420px]">
-    <aside class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div class="mb-2 text-sm uppercase tracking-wide text-slate-500">Emerson explorer</div>
-      <h1 class="mb-3 text-2xl font-semibold">Self-Reliance Network</h1>
-      <p class="mb-5 text-sm text-slate-600">
+<body class="min-h-screen p-4 text-slate-900 lg:p-6">
+  <div class="mx-auto grid max-w-[1600px] grid-cols-1 gap-5 xl:grid-cols-[340px_minmax(0,1fr)_430px]">
+    <aside class="panel self-start rounded-[32px] p-6 xl:sticky xl:top-6 xl:p-7">
+      <div class="kicker mb-3">Emerson explorer</div>
+      <h1 class="display-font mb-4 text-4xl leading-none text-slate-900">Self-Reliance Network</h1>
+      <p class="mb-6 max-w-[24rem] text-[15px] leading-7 text-slate-600">
         Select one Emerson idea to compare thinkers. Click any node or directory card to read a summary of that person’s stance on all three ideas.
       </p>
 
       <div id="ideaButtons" class="space-y-3"></div>
 
-      <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-        <div class="mb-2 font-semibold text-slate-800">Legend</div>
+      <div class="subpanel mt-6 rounded-[28px] p-5 text-sm text-slate-600">
+        <div class="mb-3 flex items-center justify-between gap-3">
+          <div class="font-semibold text-slate-800">Legend</div>
+          <span class="stat-pill stat-pill--neutral">Distance 1-5</span>
+        </div>
         <div class="mb-1 flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-full bg-green-600"></span> Agreement</div>
         <div class="mb-1 flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-full bg-red-600"></span> Disagreement</div>
-        <div class="mb-1">Distance 1 = very close, 5 = very far.</div>
-        <div>Lines connect each thinker to Emerson. Greater distance pushes the node farther from center.</div>
+        <div class="mt-3 leading-6">Distance 1 means very close to Emerson; 5 means much farther away. Lines connect each thinker to the center point.</div>
       </div>
 
-      <button id="toggleDirectory" class="mt-6 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left text-sm font-medium text-slate-700 hover:bg-slate-50"></button>
+      <button id="toggleDirectory" class="soft-button mt-6 w-full rounded-2xl px-4 py-3 text-left text-sm font-semibold text-slate-700"></button>
 
-      <div id="validationBox" class="mt-6 hidden rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+      <div id="validationBox" class="mt-6 hidden rounded-[28px] border border-amber-200 bg-amber-50/90 p-5 text-sm text-amber-900">
         <div class="mb-2 font-semibold">Dataset checks</div>
         <ul id="validationList" class="list-disc space-y-1 pl-5"></ul>
       </div>
     </aside>
 
     <main class="space-y-6">
-      <section class="relative min-h-[760px] overflow-hidden rounded-3xl border border-slate-200 bg-white p-4 shadow-sm md:p-6">
-        <div class="mb-4 flex items-start justify-between gap-4">
+      <section class="panel relative min-h-[760px] overflow-hidden rounded-[34px] p-5 md:p-7">
+        <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <div class="text-sm uppercase tracking-wide text-slate-500">Selected idea</div>
-            <h2 id="selectedIdeaLabel" class="text-2xl font-semibold"></h2>
-            <p id="selectedIdeaDescription" class="mt-1 max-w-2xl text-sm text-slate-600"></p>
+            <div class="kicker">Selected idea</div>
+            <h2 id="selectedIdeaLabel" class="display-font mt-2 text-4xl leading-none text-slate-900"></h2>
+            <p id="selectedIdeaDescription" class="mt-3 max-w-3xl text-[15px] leading-7 text-slate-600"></p>
           </div>
-          <div class="text-right text-sm text-slate-500">
-            <div id="agreeCount"></div>
-            <div id="disagreeCount"></div>
+          <div class="flex flex-wrap gap-2 lg:justify-end">
+            <div id="agreeCount" class="stat-pill stat-pill--agree"></div>
+            <div id="disagreeCount" class="stat-pill stat-pill--disagree"></div>
           </div>
         </div>
 
-        <div class="relative h-[680px] overflow-hidden rounded-[28px] border border-slate-200 bg-gradient-to-b from-slate-50 to-white">
-          <div class="absolute left-6 top-5 text-sm font-medium text-green-700">Agreement</div>
-          <div class="absolute right-6 top-5 text-sm font-medium text-red-700">Disagreement</div>
-          <svg id="graph" viewBox="0 0 100 100" preserveAspectRatio="none" class="absolute inset-0 h-full w-full"></svg>
-          <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-slate-900 px-4 py-2 text-center text-sm font-semibold leading-tight text-white shadow-lg">
+        <div class="graph-stage relative h-[700px] overflow-hidden rounded-[32px] border border-white/70">
+          <div class="absolute left-7 top-6 text-sm font-semibold uppercase tracking-[0.12em] text-green-800/80">Agreement</div>
+          <div class="absolute right-7 top-6 text-sm font-semibold uppercase tracking-[0.12em] text-red-800/80">Disagreement</div>
+          <svg id="graph" viewBox="0 0 100 100" preserveAspectRatio="none" class="graph-svg absolute inset-0 h-full w-full"></svg>
+          <div class="emerson-badge absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full px-4 py-2 text-center text-sm leading-tight text-white md:text-[15px]">
             Ralph Waldo Emerson
-            <div class="text-[11px] text-slate-300">1803–1882</div>
+            <div class="mt-0.5 text-[10px] font-medium tracking-[0.12em] text-slate-300">1803–1882</div>
           </div>
         </div>
       </section>
 
-      <section id="directorySection" class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section id="directorySection" class="panel rounded-[32px] p-6">
         <div class="mb-4 flex items-center justify-between gap-4">
           <div>
-            <div class="text-sm uppercase tracking-wide text-slate-500">Thinker directory</div>
-            <h3 id="directoryHeading" class="text-xl font-semibold"></h3>
+            <div class="kicker">Thinker directory</div>
+            <h3 id="directoryHeading" class="display-font mt-2 text-3xl leading-none text-slate-900"></h3>
           </div>
-          <div class="text-sm text-slate-500">Click a card to open details</div>
+          <div class="hidden text-sm text-slate-500 md:block">Click any card to open the full thinker profile.</div>
         </div>
         <div id="directoryGrid" class="grid grid-cols-1 gap-3 md:grid-cols-2"></div>
       </section>
     </main>
 
-    <aside class="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div class="mb-2 text-sm uppercase tracking-wide text-slate-500">Selected thinker</div>
+    <aside class="panel self-start rounded-[32px] p-6 xl:sticky xl:top-6 xl:p-7">
+      <div class="kicker mb-3">Selected thinker</div>
       <div id="personPanel"></div>
     </aside>
   </div>
@@ -498,13 +701,14 @@
 
     function renderIdeaButtons() {
       ideaButtons.innerHTML = "";
-      data.ideas.forEach(idea => {
+      data.ideas.forEach((idea, index) => {
         const active = idea.id === selectedIdea;
         const button = document.createElement("button");
-        button.className = `w-full rounded-2xl border p-4 text-left transition ${active ? "border-slate-900 bg-slate-900 text-white" : "border-slate-200 bg-slate-50 hover:bg-slate-100"}`;
+        button.className = `idea-card w-full rounded-[28px] p-5 text-left ${active ? "active" : ""}`;
         button.innerHTML = `
-          <div class="font-semibold">${idea.label}</div>
-          <p class="mt-1 text-sm ${active ? "text-slate-200" : "text-slate-600"}">${idea.description}</p>
+          <div class="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] ${active ? "muted-on-dark" : "text-slate-400"}">Idea 0${index + 1}</div>
+          <div class="text-2xl font-semibold leading-tight ${active ? "text-white" : "text-slate-900"}">${idea.label}</div>
+          <p class="mt-3 text-[15px] leading-7 ${active ? "muted-on-dark" : "text-slate-600"}">${idea.description}</p>
         `;
         button.onclick = () => {
           selectedIdea = idea.id;
@@ -531,6 +735,11 @@
       disagreeCount.textContent = `${disagree.length} disagree`;
 
       graph.innerHTML = `
+        <defs>
+          <filter id="selected-node-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow dx="0" dy="0" stdDeviation="1.2" flood-color="#0f172a" flood-opacity="0.18"></feDropShadow>
+          </filter>
+        </defs>
         <line x1="50" y1="10" x2="50" y2="90" stroke="#e2e8f0" stroke-width="0.35" stroke-dasharray="1.2 1.2"></line>
       `;
 
@@ -540,6 +749,8 @@
         const lineColor = side === "agree" ? "#16a34a" : "#dc2626";
         const fillColor = side === "agree" ? "#dcfce7" : "#fee2e2";
         const strokeColor = side === "agree" ? "#16a34a" : "#dc2626";
+        const labelAnchor = "end";
+        const labelX = pos.x - 3.2;
 
         const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
         g.style.cursor = "pointer";
@@ -552,8 +763,16 @@
             y2="${pos.y}"
             stroke="${lineColor}"
             stroke-width="${isSelected ? 0.55 : 0.4}"
-            opacity="0.8"
+            opacity="${isSelected ? 0.95 : 0.78}"
           ></line>
+          <circle
+            cx="${pos.x}"
+            cy="${pos.y}"
+            r="${isSelected ? 4.55 : 0}"
+            fill="white"
+            opacity="${isSelected ? 0.75 : 0}"
+            filter="${isSelected ? "url(#selected-node-glow)" : ""}"
+          ></circle>
           <circle
             cx="${pos.x}"
             cy="${pos.y}"
@@ -563,20 +782,20 @@
             stroke-width="${isSelected ? 0.45 : 0.35}"
           ></circle>
           <text
-            x="${pos.x}"
-            y="${pos.y - 4.2}"
-            text-anchor="middle"
-            style="font-size:2.1px;fill:#334155;font-weight:600;"
+            x="${labelX}"
+            y="${pos.y - 1.2}"
+            text-anchor="${labelAnchor}"
+            style="font-size:2.05px;fill:#2a3a54;font-weight:700;"
           >${person.name}</text>
           <text
-            x="${pos.x}"
-            y="${pos.y - 2.2}"
-            text-anchor="middle"
-            style="font-size:1.7px;fill:#64748b;"
+            x="${labelX}"
+            y="${pos.y + 0.8}"
+            text-anchor="${labelAnchor}"
+            style="font-size:1.65px;fill:#64748b;font-weight:500;"
           >${formatYears(person.birth, person.death)}</text>
           <text
             x="${pos.x}"
-            y="${pos.y + 0.9}"
+            y="${pos.y + 0.95}"
             text-anchor="middle"
             style="font-size:2.2px;fill:#0f172a;font-weight:700;"
           >${person.distance}</text>
@@ -605,16 +824,16 @@
         const topic = person.topicSummaries[selectedIdea];
         const active = person.id === selectedPersonId;
         const button = document.createElement("button");
-        button.className = `rounded-2xl border p-4 text-left transition ${active ? "border-slate-900 bg-slate-900 text-white" : "border-slate-200 bg-slate-50 hover:bg-slate-100"}`;
+        button.className = `directory-card rounded-[26px] p-5 text-left ${active ? "active" : ""}`;
         button.innerHTML = `
           <div class="flex items-start justify-between gap-3">
             <div>
-              <div class="font-semibold">${person.name}</div>
-              <div class="text-sm ${active ? "text-slate-300" : "text-slate-500"}">${formatYears(person.birth, person.death)}</div>
+              <div class="text-lg font-semibold leading-tight ${active ? "text-white" : "text-slate-900"}">${person.name}</div>
+              <div class="mt-1 text-sm ${active ? "muted-on-dark" : "text-slate-500"}">${formatYears(person.birth, person.death)}</div>
             </div>
             <span class="rounded-full border px-2.5 py-1 text-xs font-medium ${active ? "border-white/20 bg-white/10 text-white" : stanceClass(topic.stance)}">${topic.stance}</span>
           </div>
-          <p class="mt-3 text-sm leading-6 ${active ? "text-slate-200" : "text-slate-600"}">${topic.summary}</p>
+          <p class="mt-4 text-[15px] leading-7 ${active ? "muted-on-dark" : "text-slate-600"}">${topic.summary}</p>
         `;
         button.onclick = () => {
           selectedPersonId = person.id;
@@ -633,27 +852,27 @@
       }
 
       personPanel.innerHTML = `
-        <h3 class="text-2xl font-semibold">${selectedPerson.name}</h3>
-        <div class="mt-1 text-slate-500">${formatYears(selectedPerson.birth, selectedPerson.death)}</div>
+        <h3 class="display-font text-4xl leading-none text-slate-900">${selectedPerson.name}</h3>
+        <div class="mt-3 text-base text-slate-500">${formatYears(selectedPerson.birth, selectedPerson.death)}</div>
 
-        <div class="mt-4 flex flex-wrap gap-2">
-          <span class="rounded-full px-3 py-1 text-sm ${selectedPerson.side === "agree" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}">
+        <div class="mt-5 flex flex-wrap gap-2">
+          <span class="stat-pill ${selectedPerson.side === "agree" ? "stat-pill--agree" : "stat-pill--disagree"}">
             ${selectedPerson.side === "agree" ? "Overall agreement" : "Overall disagreement"}
           </span>
-          <span class="rounded-full bg-slate-100 px-3 py-1 text-sm text-slate-700">
+          <span class="stat-pill stat-pill--neutral">
             Distance ${selectedPerson.distance}
           </span>
         </div>
 
-        <div class="mt-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
-          <div class="mb-2 text-sm font-semibold text-slate-800">Why this person is placed here</div>
-          <p class="text-sm leading-6 text-slate-700">${selectedPerson.reason}</p>
+        <div class="subpanel mt-6 rounded-[28px] p-5">
+          <div class="mb-3 text-sm font-semibold uppercase tracking-[0.14em] text-slate-500">Why this person is placed here</div>
+          <p class="text-[15px] leading-8 text-slate-700">${selectedPerson.reason}</p>
         </div>
 
         <div id="topicCards" class="mt-6 space-y-4"></div>
 
-        <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-          <div class="mb-2 font-semibold text-slate-800">Built-in checks</div>
+        <div class="subpanel mt-6 rounded-[28px] p-5 text-sm text-slate-600">
+          <div class="mb-3 font-semibold text-slate-800">Built-in checks</div>
           <ul class="list-disc space-y-1 pl-5">
             <li>Exactly 3 Emerson ideas.</li>
             <li>Exactly 20 thinkers.</li>
@@ -669,18 +888,18 @@
         const topic = selectedPerson.topicSummaries[idea.id];
         const active = selectedIdea === idea.id;
         const card = document.createElement("div");
-        card.className = `rounded-2xl border p-4 ${active ? "border-slate-900 bg-slate-900 text-white" : "border-slate-200 bg-white"}`;
+        card.className = `topic-card rounded-[28px] p-5 ${active ? "active" : ""}`;
         card.innerHTML = `
           <div class="flex items-start justify-between gap-3">
             <button class="topic-switch text-left">
-              <div class="font-semibold">${idea.label}</div>
-              <div class="mt-1 text-xs ${active ? "text-slate-300" : "text-slate-500"}">Click to filter the graph by this idea</div>
+              <div class="text-2xl font-semibold leading-tight ${active ? "text-white" : "text-slate-900"}">${idea.label}</div>
+              <div class="mt-2 text-xs font-semibold uppercase tracking-[0.14em] ${active ? "muted-on-dark" : "text-slate-500"}">Click to filter the graph by this idea</div>
             </button>
             <span class="rounded-full border px-2.5 py-1 text-xs font-medium ${active ? "border-white/20 bg-white/10 text-white" : stanceClass(topic.stance)}">
               ${topic.stance}
             </span>
           </div>
-          <p class="mt-3 text-sm leading-6 ${active ? "text-slate-200" : "text-slate-700"}">${topic.summary}</p>
+          <p class="mt-4 text-[15px] leading-8 ${active ? "muted-on-dark" : "text-slate-700"}">${topic.summary}</p>
         `;
         card.querySelector(".topic-switch").onclick = () => {
           selectedIdea = idea.id;
